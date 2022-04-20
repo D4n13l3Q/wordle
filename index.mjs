@@ -11,17 +11,33 @@ const secret = "rebus";
 
 // Funzioni
 
+const countOccurrences = (str) => str.split("").reduce( function(elements, character) {
+    elements[character] ? elements[character]++ : elements[character] = 1;
+    return elements;
+}, {});
+
+
+
+const removeFirstOccurence = function(myarray) {
+    let index = array.indexOf(item);
+    if (index >= 0) array.splice(index, 1);    
+}
+
+
+/*
 const check = function(input, secret) {
+    
+    secret = secret.split("");
     
     let guessed = true;
     let output = [];
     
     for (let i in secret) {
-        
+    
         if (secret[i] === input[i]) {
-        
+                
             output.push(chalk.green(input[i]));
-        
+            
         } else {
          
             if (secret.includes(input[i])) {
@@ -37,11 +53,58 @@ const check = function(input, secret) {
             guessed = false;
             
         }
+        
+        secret[i] = "*";
                 
     }
     
     return {
         output : output.join("-"),
+        guessed : guessed
+    };
+    
+}
+*/
+
+
+
+
+
+const check = function(input, secret) {
+    
+    input = input.toUpperCase().split("");   // Converto "input"...
+    secret = secret.toUpperCase().split(""); // ...e "secret" in tutto maiuscolo e li divido in array di caratteri (in realtà array di stringhe da un carattere).
+    
+    let guessed = true;
+    
+    let output = input.map( function (inputChar, inputCharIndex) {
+        
+        let secretCharIndex = secret.indexOf(inputChar);
+        
+        if (secretCharIndex < 0) { // Se "inputChar" non è presente in "secret"...
+            
+            inputChar = chalk.grey(inputChar); // ...coloro "inputChar" di grigio (non è più un singolo carattere ma non mi interessa).
+            guessed = false;
+            
+        } else { // ...altrimenti se è presente in "secret"...
+            
+            if (inputCharIndex === secretCharIndex) // ...se gli index sono uguali (sono nella stessa posizione)...
+                inputChar = chalk.green(inputChar); // ...coloro "inputChar" di verde...
+            else { // ...alrimenti...
+                inputChar = chalk.yellow(inputChar); // ...color "inputChar" di giallo...
+                guessed = false;
+            }
+            
+            secret[secretCharIndex] = "*"; // ...inoltre cambio la lettera trovata ad un asterisco per non controllarla di nuovo.
+            
+        }
+        
+        return inputChar;
+        
+    } );
+    
+    return {
+        output : output.join(""),
         guessed : guessed
     };
     
