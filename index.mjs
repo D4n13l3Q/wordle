@@ -11,51 +11,73 @@ const secret = "rebus";
 
 // Funzioni
 
-const countOccurrences = (str) => str.split("").reduce( function(elements, character) {
-    elements[character] ? elements[character]++ : elements[character] = 1;
-    return elements;
-}, {});
+const countOccurrences = (array) => array.reduce(
+    function(occurrences, item) {
+        occurrences.hasOwnProperty(item) ? occurrences[item]++ : occurrences[item] = 1; // Se "occurrences" ha già la proprietà "item" la incremento, altrimenti la aggiungo impstandola ad 1.
+        return occurrences;
+    },
+    {} // Valore inziale per "occurrences" (oggetto vuoto).
+);
 
 
 
-const removeFirstOccurence = function(myarray) {
-    let index = array.indexOf(item);
-    if (index >= 0) array.splice(index, 1);    
-}
 
 
 /*
+const countOccurrences = function (array, item, occurrences = 0) {
+    
+    let index = array.indexOf(item);
+    
+    if (index < 0)
+        return occurrences;
+    else
+        return countOccurrences(array.slice(index + 1), item, occurrences + 1);
+    
+} 
+*/
+
+
 const check = function(input, secret) {
     
-    secret = secret.split("");
+    input = input.toUpperCase().split("");   // Converto "input"...
+    secret = secret.toUpperCase().split(""); // ...e "secret" in tutto maiuscolo e li divido in array di caratteri (in realtà array di stringhe da un carattere).
+    
+    let secretOccurrences = countOccurrences(secret);
     
     let guessed = true;
+    
     let output = [];
     
-    for (let i in secret) {
-    
-        if (secret[i] === input[i]) {
-                
-            output.push(chalk.green(input[i]));
+    for (let i = 0; i < input.length; i++) {
+        
+        if (input[i] === secret[i]) {
+            
+            output[i] = chalk.green(input[i]);
+            
+            secretOccurrences[input[i]]--;
             
         } else {
-         
-            if (secret.includes(input[i])) {
-                
-                output.push(chalk.yellow(input[i]));
-                
-            } else {
-                
-                output.push(chalk.grey(input[i]));
-                
-            }
-            
             guessed = false;
-            
         }
         
-        secret[i] = "*";
+    }
+    
+    for (let i = 0; i < input.length; i++) {
+        
+        if (input[i] !== secret[i]) {
+            if (secretOccurrences[input[i]] > 0) {
                 
+                // Giallo
+                output[i] = chalk.yellow(input[i]);
+                
+                secretOccurrences[input[i]]--;
+                
+            } else {
+                // Grigio
+                output[i] = chalk.grey(input[i]);
+            }
+        }
+        
     }
     
     return {
@@ -64,52 +86,6 @@ const check = function(input, secret) {
     };
     
 }
-*/
-
-
-
-
-
-const check = function(input, secret) {
-    
-    input = input.toUpperCase().split("");   // Converto "input"...
-    secret = secret.toUpperCase().split(""); // ...e "secret" in tutto maiuscolo e li divido in array di caratteri (in realtà array di stringhe da un carattere).
-    
-    let guessed = true;
-    
-    let output = input.map( function (inputChar, inputCharIndex) {
-        
-        let secretCharIndex = secret.indexOf(inputChar);
-        
-        if (secretCharIndex < 0) { // Se "inputChar" non è presente in "secret"...
-            
-            inputChar = chalk.grey(inputChar); // ...coloro "inputChar" di grigio (non è più un singolo carattere ma non mi interessa).
-            guessed = false;
-            
-        } else { // ...altrimenti se è presente in "secret"...
-            
-            if (inputCharIndex === secretCharIndex) // ...se gli index sono uguali (sono nella stessa posizione)...
-                inputChar = chalk.green(inputChar); // ...coloro "inputChar" di verde...
-            else { // ...alrimenti...
-                inputChar = chalk.yellow(inputChar); // ...color "inputChar" di giallo...
-                guessed = false;
-            }
-            
-            secret[secretCharIndex] = "*"; // ...inoltre cambio la lettera trovata ad un asterisco per non controllarla di nuovo.
-            
-        }
-        
-        return inputChar;
-        
-    } );
-    
-    return {
-        output : output.join(""),
-        guessed : guessed
-    };
-    
-}
-
 
 
 
@@ -124,7 +100,7 @@ const rl = readline.createInterface({
 
 const game = function(attempts, prompt = "Inserisci una parola: ") {
     
-    if (attempts <= 0) return rl.close(); // Se i tentativi rimasti sono meno di zero (zero è l'ultimo tetnativo valido) esco chiudendo readline.
+    if (attempts < 1) return rl.close(); // Se i tentativi rimasti sono meno di zero (zero è l'ultimo tetnativo valido) esco chiudendo readline.
     
     rl.question(prompt, (userInput) => {
         
@@ -142,11 +118,11 @@ const game = function(attempts, prompt = "Inserisci una parola: ") {
                     
                 console.log("Bravo, hai indovinato!");
                     
-                attempts = 0; // Impost "attempts" a ultimo tentativo.
+                attempts = 0; // Imposta "attempts" a ultimo tentativo.
                 
             } else {
                 
-                if (attempts > 0) {
+                if (attempts > 1) {
                     
                     //console.log("Sbagliato, riprova.");
                     prompt = "Sbagliato, riprova: "; // Cambio il prompt iniziale.
