@@ -2,24 +2,24 @@ import readline from "readline";
 
 import chalk from "chalk";
 
-
-
-const secret = "rebus";
+import * as wordle from "./wordle-lib.mjs";
 
 
 
 
 // Funzioni
 
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+
+
 const countOccurrences = (array) => array.reduce(
     function(occurrences, item) {
-        occurrences.hasOwnProperty(item) ? occurrences[item]++ : occurrences[item] = 1; // Se "occurrences" ha già la proprietà "item" la incremento, altrimenti la aggiungo impstandola ad 1.
+        occurrences.hasOwnProperty(item) ? occurrences[item]++ : occurrences[item] = 1; // Se "occurrences" ha già una proprietà proprietà chiamata come il valore di "item" la incremento, altrimenti la aggiungo impstandola ad 1.
         return occurrences;
     },
     {} // Valore inziale per "occurrences" (oggetto vuoto).
 );
-
-
 
 
 
@@ -35,6 +35,7 @@ const countOccurrences = function (array, item, occurrences = 0) {
     
 } 
 */
+
 
 
 const check = function(input, secret) {
@@ -91,6 +92,16 @@ const check = function(input, secret) {
 
 
 
+
+
+// MAIN
+
+const dictionaryPath = process.argv[2] !== undefined ? process.argv[2] : "dictionary.txt";
+
+const words = wordle.getWords(dictionaryPath);
+
+const secret = words[randomInt(0, words.length)].toUpperCase();
+
 const maxAttempts = 6;
 
 const rl = readline.createInterface({
@@ -110,7 +121,7 @@ const game = function(attempts, prompt = "Inserisci una parola: ") {
             
         } else { // ...altrimenti...
             
-            let test = check(userInput.toUpperCase(), secret.toUpperCase());
+            let test = check(userInput.toUpperCase(), secret);
             
             console.log(test.output);
             
@@ -129,7 +140,8 @@ const game = function(attempts, prompt = "Inserisci una parola: ") {
                     
                 } else {
                     
-                    console.log("Hai esaurito i tentativi. Riprova un'altra volta.");
+                    console.log(`Sbagliato, la parola era "${secret}".`);
+                    console.log("Hai esaurito i tentativi, riprova un'altra volta.");
                     
                 }
                 
