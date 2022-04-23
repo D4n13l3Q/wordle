@@ -7,43 +7,22 @@ import * as wordle from "./wordle-lib.mjs";
 
 
 
+
+// Costanti
+
+const maxAttempts = 6;
+
+
+
+
 // Funzioni
-
-const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
-
-
-const countOccurrences = (array) => array.reduce(
-    function(occurrences, item) {
-        occurrences.hasOwnProperty(item) ? occurrences[item]++ : occurrences[item] = 1; // Se "occurrences" ha già una proprietà proprietà chiamata come il valore di "item" la incremento, altrimenti la aggiungo impstandola ad 1.
-        return occurrences;
-    },
-    {} // Valore inziale per "occurrences" (oggetto vuoto).
-);
-
-
-
-/*
-const countOccurrences = function (array, item, occurrences = 0) {
-    
-    let index = array.indexOf(item);
-    
-    if (index < 0)
-        return occurrences;
-    else
-        return countOccurrences(array.slice(index + 1), item, occurrences + 1);
-    
-} 
-*/
-
-
 
 const check = function(input, secret) {
     
     input = input.toUpperCase().split("");   // Converto "input"...
     secret = secret.toUpperCase().split(""); // ...e "secret" in tutto maiuscolo e li divido in array di caratteri (in realtà array di stringhe da un carattere).
     
-    let secretOccurrences = countOccurrences(secret);
+    let secretOccurrences = wordle.countOccurrences(secret);
     
     let guessed = true;
     
@@ -100,18 +79,18 @@ const dictionaryPath = process.argv[2] !== undefined ? process.argv[2] : "dictio
 
 const words = wordle.getWords(dictionaryPath);
 
-const secret = words[randomInt(0, words.length)].toUpperCase();
-
-const maxAttempts = 6;
+const secret = words[wordle.randomInt(0, words.length)].toUpperCase();
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
+console.log(`La parola da indovinare è lunga ${secret.length} lettere.`); // Tutto il resto dovrebbe funzionare indipendentemente dalla lunghezza della parola segreta qudindi conviene farla sapere all'utente.
+
 const game = function(attempts, prompt = "Inserisci una parola: ") {
     
-    if (attempts < 1) return rl.close(); // Se i tentativi rimasti sono meno di zero (zero è l'ultimo tetnativo valido) esco chiudendo readline.
+    if (attempts < 1) return rl.close(); // Se i tentativi rimasti sono meno di zero (zero è l'ultimo tentativo valido) esco chiudendo readline.
     
     rl.question(prompt, (userInput) => {
         

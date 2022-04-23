@@ -6,6 +6,35 @@ import fs from "fs";
 
 // Funzioni
 
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+
+
+const countOccurrences = (array) => array.reduce(
+    function(occurrences, item) {
+        occurrences.hasOwnProperty(item) ? occurrences[item]++ : occurrences[item] = 1; // Se "occurrences" ha già una proprietà proprietà chiamata come il valore di "item" la incremento, altrimenti la aggiungo impstandola ad 1.
+        return occurrences;
+    },
+    {} // Valore inziale per "occurrences" (oggetto vuoto).
+);
+
+
+
+/*
+const countOccurrences = function (array, item, occurrences = 0) {
+
+    let index = array.indexOf(item);
+
+    if (index < 0)
+        return occurrences;
+    else
+        return countOccurrences(array.slice(index + 1), item, occurrences + 1);
+
+}
+*/
+
+
+
 const getWords = function(file) { // "file" = nome file e/o path.
         
     let words = [];
@@ -43,5 +72,7 @@ const getWords = function(file) { // "file" = nome file e/o path.
 // Exports
 
 export {
+    randomInt,
+    countOccurrences,
     getWords
 };
