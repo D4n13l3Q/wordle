@@ -80,6 +80,7 @@ const dictionaryPath = process.argv[2] !== undefined ? process.argv[2] : "dictio
 const words = wordle.getWords(dictionaryPath);
 
 const secret = words[wordle.randomInt(0, words.length)].toUpperCase();
+//const secret = "CODE";
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -88,7 +89,9 @@ const rl = readline.createInterface({
 
 console.log(`La parola da indovinare è lunga ${secret.length} lettere.`); // Tutto il resto dovrebbe funzionare indipendentemente dalla lunghezza della parola segreta qudindi conviene farla sapere all'utente.
 
-const game = function(attempts, prompt = "Inserisci una parola: ") {
+console.log(`Hai a disposizione ${maxAttempts} tentativi.`);
+
+const game = function(attempts, prompt = "\nInserisci una parola: ") {
     
     if (attempts < 1) return rl.close(); // Se i tentativi rimasti sono meno di zero (zero è l'ultimo tentativo valido) esco chiudendo readline.
     
@@ -96,17 +99,17 @@ const game = function(attempts, prompt = "Inserisci una parola: ") {
         
         if (userInput.length !== secret.length || !(/^[a-zA-Z]+$/.test(userInput))) { // Se "userInput" è più o meno lunga di "secret" o contiene caratteri non alfabetici...
             
-            prompt = "Input non valido! Riprova: "; // ...messaggio di errore e salto subito alla chiamata ricorsiva (senza decrementare il numero di tentativi rimasti).
+            prompt = `\nInput non valido!\nHai ancora ${attempts - 1} tentativ${attempts - 1 > 1 ? "i" : "o"}.\nRiprova: `; // ...messaggio di errore e salto subito alla chiamata ricorsiva (senza decrementare il numero di tentativi rimasti).
             
         } else { // ...altrimenti...
             
             let test = check(userInput.toUpperCase(), secret);
             
-            console.log(test.output);
+            console.log(`\n${test.output}`);
             
             if (test.guessed) {
                     
-                console.log("Bravo, hai indovinato!");
+                console.log("\nBravo, hai indovinato!");
                     
                 attempts = 0; // Imposta "attempts" a ultimo tentativo.
                 
@@ -115,12 +118,12 @@ const game = function(attempts, prompt = "Inserisci una parola: ") {
                 if (attempts > 1) {
                     
                     //console.log("Sbagliato, riprova.");
-                    prompt = "Sbagliato, riprova: "; // Cambio il prompt iniziale.
+                    prompt = `\nSbagliato, ma hai ancora ${attempts - 1} tentativ${attempts - 1 > 1 ? "i" : "o"}.\nRiprova: `; // Cambio il prompt iniziale.
                     
                 } else {
                     
-                    console.log(`Sbagliato, la parola era "${secret}".`);
-                    console.log("Hai esaurito i tentativi, riprova un'altra volta.");
+                    console.log(`\nSbagliato, la parola era "${secret}".`);
+                    console.log("\nHai esaurito i tentativi, riprova un'altra volta.");
                     
                 }
                 
